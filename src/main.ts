@@ -19,13 +19,13 @@ const {
     maxRequestsPerCrawl = 10,
 } = await Actor.getInput<Input>() ?? {} as Input;
 
-// const proxyConfiguration = await Actor.createProxyConfiguration();
+const proxyConfiguration = await Actor.createProxyConfiguration();
 
 log.setLevel(log.LEVELS.DEBUG);
 log.debug('Setting up crawler.');
 
 const crawler = new CheerioCrawler({
-    // proxyConfiguration,
+    proxyConfiguration,
     useSessionPool: true,
     sessionPoolOptions: {
         sessionOptions: {

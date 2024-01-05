@@ -87,15 +87,20 @@ export function getChart($: CheerioAPI): any {
     return transformedChart;
 }
 
-export function getLocation($: CheerioAPI): string {
-    const addressCountry = $('address span[itemprop="addressCountry"]').text().trim();
-    const addressLocality = $('address span[itemprop="addressLocality"]').text().trim();
-    const addressRegion = $('address span[itemprop="addressRegion"]').text().trim();
-    const postalCode = $('address span[itemprop="postalCode"]').text().trim();
-    const streetAddress = $('address span[itemprop="streetAddress"]').text().trim();
-    const telephone = $('address meta[itemprop="telephone"]').attr('content')?.trim() || '';
+export function getLocations($: CheerioAPI): Record<string, string> {
+    let locations: Record<string, string> = {};
+    $('div.profile-locations--item').each((index, element) => {
+        const addressCountry = $(element).find('span[itemprop="addressCountry"]').text().trim();
+        const addressLocality = $(element).find('span[itemprop="addressLocality"]').text().trim();
+        const addressRegion = $(element).find('span[itemprop="addressRegion"]').text().trim();
+        const postalCode = $(element).find('span[itemprop="postalCode"]').text().trim();
+        const streetAddress = $(element).find('span[itemprop="streetAddress"]').text().trim();
+        const telephone = $(element).find('meta[itemprop="telephone"]').attr('content')?.trim() || '';
 
-    return `${addressCountry}, ${addressLocality}, ${addressRegion}, ${postalCode}, ${streetAddress}, ${telephone}`;
+        locations[`address${index + 1}`] = `${addressCountry}, ${addressLocality}, ${addressRegion}, ${postalCode}, ${streetAddress}, ${telephone}`;
+    });
+
+    return locations;
 }
 
 // export function getPortfolio($: CheerioAPI): string {

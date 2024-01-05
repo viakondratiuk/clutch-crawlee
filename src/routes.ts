@@ -7,7 +7,7 @@ import {
     getRating,
     getTotalReviews,
     getChart,
-    getLocation,
+    getLocations,
     getProjectSize,
 } from './profile.js';
 import { labels } from './consts.js';
@@ -38,7 +38,7 @@ router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
         clutch_url: request.loadedUrl,
         name: getName($),
         website_url: getWebsiteUrl($),
-        location: getLocation($),
+        locations: getLocations($),
         founded: getFounded($),
         employees: getEmployees($),
         rating: getRating($),
