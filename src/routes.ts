@@ -6,7 +6,9 @@ import {
     getEmployees,
     getRating,
     getTotalReviews,
-    getChart, getLocation,
+    getChart,
+    getLocation,
+    getProjectSize,
 } from './profile.js';
 import { labels } from './consts.js';
 
@@ -41,6 +43,7 @@ router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
         employees: getEmployees($),
         rating: getRating($),
         total_reviews: getTotalReviews($),
+        project_size: getProjectSize($),
         service_lines: chart['Service Lines'],
         industries: chart.Industries,
         clients: chart.Clients,

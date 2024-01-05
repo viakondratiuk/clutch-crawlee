@@ -30,6 +30,15 @@ export function getTotalReviews($: CheerioAPI): string {
     return $("div[name*='metrics-total-reviews'] .sg-colored-card--accent").text();
 }
 
+export function getProjectSize($: CheerioAPI): string {
+    return $('dt.sg-colored-card--title').filter((_: number, element: cheerio.Element) => {
+        return $(element).text().trim() === 'Most Common Project Size';
+    }).next('dd')
+        .find('span.sg-colored-card--accent')
+        .text()
+        .trim();
+}
+
 export function getChart($: CheerioAPI): any {
     interface Chart {
         [key: string]: any;
