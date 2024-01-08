@@ -17,7 +17,7 @@ await Actor.init();
 // Structure of input is defined in input_schema.json
 const {
     startUrls = ['https://clutch.co/directory/mobile-application-developers'],
-    maxRequestsPerCrawl = 10,
+    maxRequestsPerCrawl = 100,
 } = await Actor.getInput<Input>() ?? {} as Input;
 
 log.setLevel(log.LEVELS.DEBUG);

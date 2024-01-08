@@ -32,11 +32,11 @@ router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
     }
 });
 
-router.addHandler(labels.PROFILE, async ({ $, crawler, request, log }) => {
+router.addHandler(labels.PROFILE, async ({ $, enqueueLinks, request, log }) => {
     log.debug(`Extracting profile: ${request.url}`);
 
     const chart = getChart($);
-    const profile = {
+    const results = {
         clutch_url: request.loadedUrl,
         name: getName($),
         website_url: getWebsiteUrl($),
@@ -53,23 +53,21 @@ router.addHandler(labels.PROFILE, async ({ $, crawler, request, log }) => {
     };
 
     const portfolioUrl = `${request.url}/portfolio`;
-    await crawler.addRequests([
-        {
-            url: portfolioUrl,
-            label: labels.PORTFOLIO,
-        },
-    ]);
+    await enqueueLinks({
+        urls: [portfolioUrl],
+        label: labels.PORTFOLIO,
+    });
 
     const profileDS = await Dataset.open('profile');
     log.debug(`Saving profile: ${request.url}`);
-    await profileDS.pushData(profile);
+    await profileDS.pushData(results);
 });
 
 router.addHandler(labels.PORTFOLIO, async ({ $, request, log }) => {
     log.debug(`Extracting portfolio: ${request.url}`);
 
     const results = {
-        clutch_url: request.loadedUrl,
+        clutch_url: request.url.replace('/portfolio', ''),
         portfolio: getPortfolio($),
     };
 
