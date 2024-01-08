@@ -16,8 +16,8 @@ import { labels } from './consts.js';
 export const router = createCheerioRouter();
 
 const timestamp = Date.now();
-const profileDS = `profile_${timestamp}`;
-const portfolioDS = `portfolio_${timestamp}`;
+const profileDS = `profile-${timestamp}`;
+const portfolioDS = `portfolio-${timestamp}`;
 
 router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
     const profileUrls: string[] = $('ul.directory-list h3.company_info > a').map((_, element) => {
