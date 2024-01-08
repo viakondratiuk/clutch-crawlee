@@ -10,6 +10,7 @@ import {
     getLocations,
     getProjectSize,
 } from './profile.js';
+import { getPortfolio } from './portfolio.js';
 import { labels } from './consts.js';
 
 export const router = createCheerioRouter();
@@ -30,11 +31,11 @@ router.addDefaultHandler(async ({ $, enqueueLinks, request, log }) => {
     }
 });
 
-router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
-    log.debug(`Extracting data: ${request.url}`);
+router.addHandler(labels.PROFILE, async ({ $, crawler, request, log }) => {
+    log.debug(`Extracting profile: ${request.url}`);
 
     const chart = getChart($);
-    const results = {
+    const profile = {
         clutch_url: request.loadedUrl,
         name: getName($),
         website_url: getWebsiteUrl($),
@@ -48,6 +49,27 @@ router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
         industries: chart.Industries,
         clients: chart.Clients,
         focus: chart.Focus,
+    };
+
+    log.debug(`Saving data: ${request.url}`);
+    await Dataset.pushData(profile);
+
+    // const portfolioUrl = `${request.url}/portfolio`;
+    // await crawler.addRequests([
+    //     {
+    //         url: portfolioUrl,
+    //         label: labels.PORTFOLIO,
+    //         userData: profile,
+    //     },
+    // ]);
+});
+
+router.addHandler(labels.PORTFOLIO, async ({ $, request, log }) => {
+    log.debug(`Extracting portfolio: ${request.url}`);
+
+    const results = {
+        clutch_url: request.loadedUrl,
+        portfolio: getPortfolio($),
     };
 
     log.debug(`Saving data: ${request.url}`);
