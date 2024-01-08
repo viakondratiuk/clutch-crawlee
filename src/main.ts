@@ -1,10 +1,10 @@
 import { Actor } from 'apify';
-import { CheerioCrawler, log } from 'crawlee';
+import { CheerioCrawler, log, Dataset } from 'crawlee';
 // this is ESM project, and as such, it requires you to specify extensions in your relative imports
 // read more about this here: https://nodejs.org/docs/latest-v18.x/api/esm.html#mandatory-file-extensions
 // note that we need to use `.js` even when inside TS files
 import { router } from './routes.js';
-import {labels} from "./consts.js";
+import { labels } from './consts.js';
 
 interface Input {
     startUrls: string[];
@@ -24,6 +24,8 @@ log.setLevel(log.LEVELS.DEBUG);
 log.debug('Setting up crawler.');
 
 const isLocalDevelopment = process.env.LOCAL_DEVELOPMENT === 'true';
+const failDS = await Dataset.open('fail');
+
 const crawler = new CheerioCrawler({
     proxyConfiguration: isLocalDevelopment ? undefined : await Actor.createProxyConfiguration(),
     useSessionPool: true,
@@ -38,6 +40,8 @@ const crawler = new CheerioCrawler({
     requestHandler: router,
     failedRequestHandler: async ({ request }) => {
         log.debug(`!!! ${request.url} failed. Retry this url once more.`);
+
+        await failDS.pushData({ failed_url: request.url, retries: request.retryCount });
     },
 });
 
