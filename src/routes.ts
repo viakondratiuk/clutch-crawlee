@@ -31,7 +31,24 @@ router.addDefaultHandler(async ({ $, enqueueLinks, request, log }) => {
     }
 });
 
-router.addHandler(labels.PROFILE, async ({ $, crawler, request, log }) => {
+router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
+    await enqueueLinks({
+        selector: 'ul.directory-list h3.company_info > a',
+        label: labels.PROFILE,
+    });
+
+    // Find the "Next" button and enqueue the next page of results (if it exists)
+    const nextButton = $('li.page-item.next a.page-link');
+    if (nextButton) {
+        log.debug(`Enqueueing pagination for: ${request.url}`);
+        await enqueueLinks({
+            selector: 'li.page-item.next a.page-link',
+        });
+    }
+});
+
+// router.addHandler(labels.PROFILE, async ({ $, crawler, request, log }) => {
+router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
     log.debug(`Extracting profile: ${request.url}`);
 
     const chart = getChart($);

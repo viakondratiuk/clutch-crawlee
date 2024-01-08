@@ -4,6 +4,7 @@ import { CheerioCrawler, log } from 'crawlee';
 // read more about this here: https://nodejs.org/docs/latest-v18.x/api/esm.html#mandatory-file-extensions
 // note that we need to use `.js` even when inside TS files
 import { router } from './routes.js';
+import {labels} from "./consts.js";
 
 interface Input {
     startUrls: string[];
@@ -40,6 +41,13 @@ const crawler = new CheerioCrawler({
     },
 });
 
-await crawler.run(startUrls);
+await crawler.addRequests([
+    {
+        url: 'https://clutch.co/directory/mobile-application-developers',
+        label: labels.PAGING,
+    },
+]);
+
+await crawler.run();
 
 await Actor.exit();
