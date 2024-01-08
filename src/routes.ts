@@ -13,9 +13,6 @@ import {
 import { getPortfolio } from './portfolio.js';
 import { labels } from './consts.js';
 
-const profileDS = await Dataset.open('profile');
-const portfolioDS = await Dataset.open('portfolio');
-
 export const router = createCheerioRouter();
 
 router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
@@ -36,7 +33,6 @@ router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
 });
 
 router.addHandler(labels.PROFILE, async ({ $, crawler, request, log }) => {
-// router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
     log.debug(`Extracting profile: ${request.url}`);
 
     const chart = getChart($);
@@ -64,6 +60,7 @@ router.addHandler(labels.PROFILE, async ({ $, crawler, request, log }) => {
         },
     ]);
 
+    const profileDS = await Dataset.open('profile');
     log.debug(`Saving profile: ${request.url}`);
     await profileDS.pushData(profile);
 });
@@ -76,6 +73,7 @@ router.addHandler(labels.PORTFOLIO, async ({ $, request, log }) => {
         portfolio: getPortfolio($),
     };
 
+    const portfolioDS = await Dataset.open('portfolio');
     log.debug(`Saving portfolio: ${request.url}`);
     await portfolioDS.pushData(results);
 });

@@ -24,7 +24,6 @@ log.setLevel(log.LEVELS.DEBUG);
 log.debug('Setting up crawler.');
 
 const isLocalDevelopment = process.env.LOCAL_DEVELOPMENT === 'true';
-const failDS = await Dataset.open('fail');
 
 const crawler = new CheerioCrawler({
     proxyConfiguration: isLocalDevelopment ? undefined : await Actor.createProxyConfiguration(),
@@ -39,8 +38,8 @@ const crawler = new CheerioCrawler({
     maxRequestRetries: 5,
     requestHandler: router,
     failedRequestHandler: async ({ request }) => {
+        const failDS = await Dataset.open('fail');
         log.debug(`!!! ${request.url} failed. Retry this url once more.`);
-
         await failDS.pushData({ failed_url: request.url, retries: request.retryCount });
     },
 });
