@@ -102,10 +102,3 @@ export function getLocations($: CheerioAPI): Record<string, string> {
 
     return locations;
 }
-
-// export function getPortfolio($: CheerioAPI): string {
-//     return $('ul.profile-portfolio-section__key-clients-list > li.profile-portfolio-section__key-clients-list-item')
-//         .map((_, el) => $(el).text().trim())
-//         .get()
-//         .join(', ');
-// }
