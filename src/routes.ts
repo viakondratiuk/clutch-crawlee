@@ -16,9 +16,18 @@ import { labels } from './consts.js';
 export const router = createCheerioRouter();
 
 router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
+    const profileUrls: string[] = $('ul.directory-list h3.company_info > a').map((_, element) => {
+        return $(element).attr('href');
+    }).get();
     await enqueueLinks({
-        selector: 'ul.directory-list h3.company_info > a',
+        urls: profileUrls,
         label: labels.PROFILE,
+    });
+
+    const portfolioUrls = profileUrls.map((url) => `${url}/portfolio`);
+    await enqueueLinks({
+        urls: portfolioUrls,
+        label: labels.PORTFOLIO,
     });
 
     // Find the "Next" button and enqueue the next page of results (if it exists)
@@ -32,7 +41,7 @@ router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
     }
 });
 
-router.addHandler(labels.PROFILE, async ({ $, enqueueLinks, request, log }) => {
+router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
     log.debug(`Extracting profile: ${request.url}`);
 
     const chart = getChart($);
@@ -51,12 +60,6 @@ router.addHandler(labels.PROFILE, async ({ $, enqueueLinks, request, log }) => {
         clients: chart.Clients,
         focus: chart.Focus,
     };
-
-    const portfolioUrl = `${request.url}/portfolio`;
-    await enqueueLinks({
-        urls: [portfolioUrl],
-        label: labels.PORTFOLIO,
-    });
 
     const profileDS = await Dataset.open('profile');
     log.debug(`Saving profile: ${request.url}`);
