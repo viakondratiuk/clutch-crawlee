@@ -21,10 +21,10 @@ const {
 } = await Actor.getInput<Input>() ?? {} as Input;
 
 const proxyConfiguration = process.env.IS_LOCAL_DEV === 'true' ? undefined : await Actor.createProxyConfiguration();
-const debugLevel = process.env.IS_DEBUG === 'true' ? log.LEVELS.DEBUG : log.LEVELS.INFO;
+const logLevel = process.env.IS_DEBUG === 'true' ? log.LEVELS.DEBUG : log.LEVELS.INFO;
 
-log.setLevel(debugLevel);
-log.debug('Setting up crawler.');
+log.setLevel(logLevel);
+log.info(`Setting up crawler. LogLevel=${log.getLevel()}`);
 
 const crawler = new CheerioCrawler({
     proxyConfiguration,
@@ -40,18 +40,18 @@ const crawler = new CheerioCrawler({
     requestHandler: router,
     failedRequestHandler: async ({ request }) => {
         const failDS = await Dataset.open('fail');
-        log.debug(`!!! ${request.url} failed. Retry this url once more.`);
+        log.info(`!!!FAIL: ${request.url}`);
         await failDS.pushData({ failed_url: request.url, retries: request.retryCount });
     },
 });
 
-await crawler.addRequests([
-    {
-        url: 'https://clutch.co/directory/mobile-application-developers',
+const requests = startUrls.map((url) => ({
+    url,
+    userData: {
         label: labels.PAGING,
     },
-]);
-
+}));
+await crawler.addRequests(requests);
 await crawler.run();
 
 await Actor.exit();

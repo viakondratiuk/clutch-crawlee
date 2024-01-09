@@ -37,7 +37,7 @@ router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
     // Find the "Next" button and enqueue the next page of results (if it exists)
     const nextButton = $('li.page-item.next a.page-link');
     if (nextButton) {
-        log.debug(`Enqueueing pagination for: ${request.url}`);
+        log.info(`Enqueueing pagination for: ${request.url}`);
         await enqueueLinks({
             selector: 'li.page-item.next a.page-link',
             label: labels.PAGING,
@@ -46,8 +46,6 @@ router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
 });
 
 router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
-    log.debug(`Extracting profile: ${request.url}`);
-
     const chart = getChart($);
     const results = {
         clutch_url: request.loadedUrl,
@@ -71,8 +69,6 @@ router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
 });
 
 router.addHandler(labels.PORTFOLIO, async ({ $, request, log }) => {
-    log.debug(`Extracting portfolio: ${request.url}`);
-
     const results = {
         clutch_url: request.url.replace('/portfolio', ''),
         portfolio: getPortfolio($),
