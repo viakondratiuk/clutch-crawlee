@@ -1,5 +1,5 @@
 import { Actor } from 'apify';
-import { CheerioCrawler, log, Dataset } from 'crawlee';
+import { CheerioCrawler, Dataset, log } from 'crawlee';
 // this is ESM project, and as such, it requires you to specify extensions in your relative imports
 // read more about this here: https://nodejs.org/docs/latest-v18.x/api/esm.html#mandatory-file-extensions
 // note that we need to use `.js` even when inside TS files
@@ -20,13 +20,14 @@ const {
     maxRequestsPerCrawl = 100,
 } = await Actor.getInput<Input>() ?? {} as Input;
 
-log.setLevel(log.LEVELS.DEBUG);
+const proxyConfiguration = process.env.IS_LOCAL_DEV === 'true' ? undefined : await Actor.createProxyConfiguration();
+const debugLevel = process.env.IS_DEBUG === 'true' ? log.LEVELS.DEBUG : log.LEVELS.INFO;
+
+log.setLevel(debugLevel);
 log.debug('Setting up crawler.');
 
-const isLocalDevelopment = process.env.LOCAL_DEVELOPMENT === 'true';
-
 const crawler = new CheerioCrawler({
-    proxyConfiguration: isLocalDevelopment ? undefined : await Actor.createProxyConfiguration(),
+    proxyConfiguration,
     useSessionPool: true,
     sessionPoolOptions: {
         sessionOptions: {
