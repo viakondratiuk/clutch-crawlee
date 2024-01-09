@@ -45,13 +45,6 @@ const crawler = new CheerioCrawler({
     },
 });
 
-const requests = startUrls.map((url) => ({
-    url,
-    userData: {
-        label: labels.PAGING,
-    },
-}));
-await crawler.addRequests(requests);
-await crawler.run();
+await crawler.run(startUrls);
 
 await Actor.exit();

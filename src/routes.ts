@@ -19,7 +19,7 @@ const timestamp = Date.now();
 const profileDS = `profile-${timestamp}`;
 const portfolioDS = `portfolio-${timestamp}`;
 
-router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
+router.addDefaultHandler(async ({ $, enqueueLinks, request, log }) => {
     const profileUrls: string[] = $('ul.directory-list h3.company_info > a').map((_, element) => {
         return $(element).attr('href');
     }).get();
@@ -40,7 +40,6 @@ router.addHandler(labels.PAGING, async ({ $, enqueueLinks, request, log }) => {
         log.info(`Enqueueing pagination for: ${request.url}`);
         await enqueueLinks({
             selector: 'li.page-item.next a.page-link',
-            label: labels.PAGING,
         });
     }
 });
