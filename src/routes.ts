@@ -15,38 +15,9 @@ import { labels } from './consts.js';
 
 export const router = createCheerioRouter();
 
-const timestamp = Date.now();
-const profileDS = `profile-${timestamp}`;
-const portfolioDS = `portfolio-${timestamp}`;
-
-router.addDefaultHandler(async ({ $, enqueueLinks, request, log }) => {
-    const profileUrls: string[] = $('ul.directory-list h3.company_info > a').map((_, element) => {
-        return $(element).attr('href');
-    }).get();
-    await enqueueLinks({
-        urls: profileUrls,
-        label: labels.PROFILE,
-    });
-
-    const portfolioUrls = profileUrls.map((url) => `${url}/portfolio`);
-    await enqueueLinks({
-        urls: portfolioUrls,
-        label: labels.PORTFOLIO,
-    });
-
-    // Find the "Next" button and enqueue the next page of results (if it exists)
-    const nextButton = $('li.page-item.next a.page-link');
-    if (nextButton) {
-        log.info(`Enqueueing pagination for: ${request.url}`);
-        await enqueueLinks({
-            selector: 'li.page-item.next a.page-link',
-        });
-    }
-});
-
-router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
+router.addDefaultHandler(async ({ $, crawler, request }) => {
     const chart = getChart($);
-    const results = {
+    const profile = {
         clutch_url: request.loadedUrl,
         name: getName($),
         website_url: getWebsiteUrl($),
@@ -62,18 +33,21 @@ router.addHandler(labels.PROFILE, async ({ $, request, log }) => {
         focus: chart.Focus,
     };
 
-    const profileCon = await Dataset.open(profileDS);
-    log.debug(`Saving profile: ${request.url}`);
-    await profileCon.pushData(results);
+    await crawler.addRequests([{
+        url: `${request.loadedUrl}/portfolio`,
+        label: labels.PORTFOLIO,
+        userData: { data: profile },
+    }]);
 });
 
-router.addHandler(labels.PORTFOLIO, async ({ $, request, log }) => {
-    const results = {
-        clutch_url: request.url.replace('/portfolio', ''),
-        portfolio: getPortfolio($),
+router.addHandler(labels.PORTFOLIO, async ({ $, request }) => {
+    const profile = request.userData.data;
+    const portfolio = getPortfolio($);
+
+    const combinedData = {
+        ...profile,
+        portfolio,
     };
 
-    const portfolioCon = await Dataset.open(portfolioDS);
-    log.debug(`Saving portfolio: ${request.url}`);
-    await portfolioCon.pushData(results);
+    await Dataset.pushData(combinedData);
 });

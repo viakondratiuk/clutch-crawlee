@@ -1,10 +1,9 @@
 import { Actor } from 'apify';
-import { CheerioCrawler, Dataset, log } from 'crawlee';
+import { CheerioCrawler, log } from 'crawlee';
 // this is ESM project, and as such, it requires you to specify extensions in your relative imports
 // read more about this here: https://nodejs.org/docs/latest-v18.x/api/esm.html#mandatory-file-extensions
 // note that we need to use `.js` even when inside TS files
 import { router } from './routes.js';
-import { labels } from './consts.js';
 
 interface Input {
     startUrls: string[];
@@ -16,7 +15,7 @@ await Actor.init();
 
 // Structure of input is defined in input_schema.json
 const {
-    startUrls = ['https://clutch.co/directory/mobile-application-developers'],
+    startUrls = ['https://clutch.co/profile/tech-alchemy'],
     maxRequestsPerCrawl = 100,
 } = await Actor.getInput<Input>() ?? {} as Input;
 
@@ -39,9 +38,7 @@ const crawler = new CheerioCrawler({
     maxRequestRetries: 5,
     requestHandler: router,
     failedRequestHandler: async ({ request }) => {
-        const failDS = await Dataset.open('fail');
         log.info(`!!!FAIL: ${request.url}`);
-        await failDS.pushData({ failed_url: request.url, retries: request.retryCount });
     },
 });
 
